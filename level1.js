@@ -28,10 +28,16 @@
         });
 
         elevator.on("passing_floor", function(floorNum, direction) {
-            console.log(elevator.loadFactor());
-            if (elevator.getPressedFloors().indexOf(floorNum) > -1) {
+            if (elevator.destinationQueue.indexOf(floorNum) > -1) {
+                elevator.destinationQueue = _.without(elevator.destinationQueue, floorNum);
+                elevator.checkDestinationQueue();
                 elevator.goToFloor(floorNum, true);
             }
+        });
+
+        elevator.on("stopped_at_floor", function(floorNum) {
+            elevator.destinationQueue = _.without(elevator.destinationQueue, floorNum);
+            elevator.checkDestinationQueue();
         });
 
         for (var i = 0; i < floors.length; i++) {
@@ -46,6 +52,10 @@
 
         function elevatorCanTakeMore(elevator) {
             return elevator.loadFactor() < 1 - 1.5 / elevator.maxPassengerCount();
+        };
+
+        function removeFromArray(array, item) {
+
         };
     },
     update: function(dt, elevators, floors) {
